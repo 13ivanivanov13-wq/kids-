@@ -1,473 +1,562 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alfabeto Italiano con il gatto Gatto!</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
-        body {
-            font-family: 'Nunito', sans-serif;
-            background: linear-gradient(135deg, #a8edf0 0%, #fed6e3 100%);
-            margin: 0; padding: 20px;
-            min-height: 100vh; display: flex; justify-content: center; align-items: center;
-            color: #2c3e50;
-        }
-        #app {
-            width: 100%; max-width: 920px; min-height: 680px;
-            background: #ffffff; border-radius: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15); padding: 25px;
-            display: flex; flex-direction: column; position: relative; overflow: hidden;
-            border: 6px solid #fff;
-        }
-        header {
-            display: flex; justify-content: space-between; align-items: center;
-            padding-bottom: 15px; border-bottom: 3px dashed #e0e0e0;
-        }
-        .mascot-head { display: flex; align-items: center; gap: 12px; cursor: pointer; }
-        .mascot-avatar {
-            font-size: 48px; filter: drop-shadow(2px 4px 0px rgba(0,0,0,0.1));
-            animation: bounce 2s infinite ease-in-out;
-        }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-        .mascot-speech {
-            background: #fff9c4; padding: 10px 18px; border-radius: 20px;
-            border: 2px solid #fbc02d; font-weight: 800; font-size: 16px;
-            color: #f57f17; box-shadow: 0 4px 0 #fbc02d; max-width: 480px;
-        }
-        .stats { display: flex; gap: 12px; align-items: center; }
-        .stat-badge {
-            background: #f1f8e9; border: 2px solid #7cb342; padding: 6px 14px;
-            border-radius: 20px; font-weight: 800; color: #33691e; display: flex; align-items: center; gap: 6px;
-        }
-        .nav-tabs { display: flex; justify-content: center; gap: 10px; margin: 20px 0 10px 0; flex-wrap: wrap; }
-        .tab-btn {
-            border: none; background: #f0f4f8; padding: 10px 18px; border-radius: 25px;
-            font-family: inherit; font-weight: 800; font-size: 15px; color: #607d8b;
-            cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 0 #cfd8dc;
-        }
-        .tab-btn.active { background: #ff6b6b; color: white; box-shadow: 0 4px 0 #d63031; transform: translateY(-2px); }
-        .tab-btn:hover:not(.active) { background: #e2e8f0; }
-        .view-section { display: none; flex-grow: 1; }
-        .view-section.active { display: flex; flex-direction: column; }
-        .alphabet-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; margin-top: 15px; padding: 10px; }
-        .letter-card {
-            background: #fff; border-radius: 18px; border: 3px solid #e2e8f0; aspect-ratio: 1;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.2s; box-shadow: 0 5px 0 #cbd5e1; position: relative;
-        }
-        .letter-card:hover { transform: translateY(-4px); box-shadow: 0 9px 0 #cbd5e1; }
-        .letter-card .main-char { font-family: 'Fredoka One', cursive; font-size: 26px; margin-bottom: -4px; }
-        .letter-card .sub-text { font-size: 11px; font-weight: 700; opacity: 0.8; }
-        .letter-card .badge-star { position: absolute; top: -6px; right: -6px; font-size: 14px; display: none; }
-        .letter-card.completed .badge-star { display: block; }
-        .learn-container { display: flex; gap: 25px; align-items: center; justify-content: center; margin-top: 15px; flex-grow: 1; }
-        .giant-card {
-            width: 260px; height: 310px; border-radius: 30px; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; box-shadow: 0 12px 25px rgba(0,0,0,0.1);
-            border: 5px solid rgba(255,255,255,0.8); position: relative; cursor: pointer;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .giant-card:hover { transform: scale(1.03) rotate(-2deg); }
-        .giant-letter { font-family: 'Fredoka One', cursive; font-size: 85px; line-height: 1; color: #ffffff; text-shadow: 3px 3px 0px rgba(0,0,0,0.15); }
-        .giant-sound { font-size: 20px; background: rgba(255,255,255,0.95); padding: 6px 18px; border-radius: 20px; font-weight: 900; margin-top: 15px; color: #333; }
-        .word-card {
-            flex-grow: 1; max-width: 420px; background: #fafafa; border: 3px solid #f0f0f0;
-            border-radius: 30px; padding: 25px; display: flex; flex-direction: column; align-items: center;
-            justify-content: center; text-align: center;
-        }
-        .word-emoji { font-size: 85px; margin-bottom: 10px; filter: drop-shadow(0 8px 10px rgba(0,0,0,0.1)); animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
-        .word-italian { font-family: 'Fredoka One', cursive; font-size: 36px; color: #ff5252; margin: 0; }
-        .word-trans { font-size: 20px; font-weight: 700; color: #78909c; margin-top: 4px; }
-        .audio-btn {
-            margin-top: 15px; background: #4caf50; color: white; border: none; padding: 12px 26px;
-            border-radius: 25px; font-size: 17px; font-weight: 800; cursor: pointer; box-shadow: 0 5px 0 #2e7d32;
-            display: flex; align-items: center; gap: 10px; transition: all 0.1s;
-        }
-        .audio-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #2e7d32; }
-        .game-area { display: flex; flex-direction: column; align-items: center; justify-content: center; flex-grow: 1; gap: 20px; }
-        .game-prompt { font-size: 26px; font-weight: 900; color: #37474f; text-align: center; }
-        .options-grid { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; width: 100%; }
-        .option-card {
-            background: #fff; border: 4px solid #e0e0e0; border-radius: 25px; width: 140px; height: 140px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;
-            box-shadow: 0 8px 0 #bdbdbd; transition: all 0.2s;
-        }
-        .option-card:hover { transform: translateY(-4px); border-color: #ffb74d; }
-        .option-card.correct { background: #c8e6c9 !important; border-color: #4caf50 !important; box-shadow: 0 8px 0 #2e7d32 !important; animation: pop 0.4s ease; }
-        .option-card.wrong { background: #ffcdd2 !important; border-color: #e53935 !important; box-shadow: 0 8px 0 #c62828 !important; animation: shake 0.4s ease; }
-        @keyframes pop { 50% { transform: scale(1.15); } }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-10px); } 40%, 80% { transform: translateX(10px); } }
-        .option-card .opt-text { font-family: 'Fredoka One', cursive; font-size: 55px; color: #333; }
-        .bottom-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 2px solid #f0f0f0; }
-        .action-btn {
-            background: #29b6f6; color: white; border: none; padding: 12px 28px; border-radius: 30px;
-            font-size: 17px; font-weight: 800; cursor: pointer; box-shadow: 0 6px 0 #0288d1; transition: all 0.15s;
-        }
-        .action-btn:hover { background: #03a9f4; }
-        .action-btn:active { transform: translateY(3px); box-shadow: 0 3px 0 #0288d1; }
-        .modal-overlay {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6);
-            display: none; justify-content: center; align-items: center; z-index: 100; border-radius: 25px;
-        }
-        .modal-body {
-            background: #fff; padding: 35px; border-radius: 30px; text-align: center; max-width: 450px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3); animation: pop 0.3s ease-out;
-        }
-        .modal-title { font-family: 'Fredoka One', cursive; font-size: 32px; color: #ff5252; margin-bottom: 10px; }
-        .modal-text { font-size: 18px; font-weight: 700; color: #555; margin-bottom: 25px; }
-        .sticker-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; padding: 10px; margin-top: 15px; }
-        .sticker-box {
-            background: #fdfdfd; border: 3px dashed #cfd8dc; border-radius: 20px; aspect-ratio: 1;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 40px; position: relative;
-        }
-        .sticker-box.locked { opacity: 0.35; filter: grayscale(1); }
-        .sticker-box .sticker-name { font-size: 11px; font-weight: 800; color: #78909c; margin-top: 2px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Alfabeto — gioco delle lettere italiane</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FFF7EA;
+    --ink:#2D2A4A;
+    --coral:#FF6B6B;
+    --sun:#FFD23F;
+    --sky:#3FBFB2;
+    --grass:#8BC34A;
+    --card-shadow: 0 10px 0 rgba(45,42,74,0.12), 0 18px 30px rgba(45,42,74,0.14);
+    --radius: 28px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html{height:100%;}
+  body{
+    margin:0;
+    font-family:'Nunito', sans-serif;
+    background:
+      radial-gradient(circle at 12% 8%, rgba(255,210,63,0.35), transparent 40%),
+      radial-gradient(circle at 90% 15%, rgba(63,191,178,0.30), transparent 45%),
+      radial-gradient(circle at 50% 100%, rgba(255,107,107,0.20), transparent 50%),
+      var(--cream);
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:18px 14px 34px;
+  }
+  h1,h2,h3,.display{font-family:'Fredoka', sans-serif; margin:0;}
+  .app{width:100%; max-width:480px; display:flex; flex-direction:column; gap:14px;}
+
+  .topbar{display:flex; align-items:center; gap:12px;}
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand .badge{
+    font-size:28px; width:48px; height:48px; border-radius:16px;
+    background:var(--sun); display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 6px 0 rgba(45,42,74,0.18);
+  }
+  .brand .title{font-size:19px; font-weight:600; letter-spacing:0.2px;}
+  .brand .subtitle{font-size:11.5px; color:#6b6690; font-weight:700; text-transform:uppercase; letter-spacing:1px;}
+
+  .stars-counter{
+    margin-left:auto; display:flex; align-items:center; gap:6px;
+    background:#fff; border-radius:999px; padding:7px 14px 7px 10px;
+    box-shadow:0 4px 0 rgba(45,42,74,0.10);
+    font-weight:800; font-size:15px;
+  }
+
+  .progress-wrap{
+    background:#fff; border-radius:999px; padding:5px; box-shadow: inset 0 2px 4px rgba(45,42,74,0.08);
+  }
+  .progress-track{
+    position:relative; height:14px; border-radius:999px; background:#EFE9D9; overflow:hidden;
+  }
+  .progress-fill{
+    position:absolute; inset:0; width:0%; border-radius:999px;
+    background:linear-gradient(90deg, var(--sun), var(--coral));
+    transition:width .6s cubic-bezier(.34,1.56,.64,1);
+  }
+  .progress-label{text-align:center; font-size:12.5px; font-weight:800; color:#847f9f; margin-top:6px;}
+
+  .stage{
+    background:#fff; border-radius:var(--radius); padding:22px 20px 24px;
+    box-shadow:var(--card-shadow);
+    min-height:420px;
+    max-height:calc(100vh - 150px);
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+    position:relative; overflow-y:auto; overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .mascot-row{display:flex; align-items:flex-end; gap:10px; width:100%; margin-bottom:10px;}
+  .mascot{
+    font-size:44px; line-height:1; flex-shrink:0;
+    animation: bob 2.6s ease-in-out infinite;
+    filter: drop-shadow(0 4px 4px rgba(0,0,0,0.15));
+  }
+  @keyframes bob{ 0%,100%{transform:translateY(0) rotate(-3deg);} 50%{transform:translateY(-7px) rotate(3deg);} }
+  .mascot.happy{ animation: jump .5s ease-in-out 3; }
+  @keyframes jump{ 0%,100%{transform:translateY(0) scale(1);} 50%{transform:translateY(-16px) scale(1.08);} }
+  .mascot.oops{ animation: shake .4s ease; }
+  @keyframes shake{ 0%,100%{transform:translateX(0);} 25%{transform:translateX(-8px) rotate(-5deg);} 75%{transform:translateX(8px) rotate(5deg);} }
+
+  .bubble{
+    background:#F4F1FF; border-radius:16px 16px 16px 4px; padding:10px 14px;
+    font-weight:700; font-size:14.5px; color:var(--ink); flex:1;
+    box-shadow: 0 3px 0 rgba(45,42,74,0.08);
+  }
+
+  .stage-body{width:100%; display:flex; flex-direction:column; align-items:center; gap:16px; flex:1; justify-content:center;}
+
+  .letter-card{
+    width:180px; height:180px; border-radius:32px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fredoka'; font-weight:700; font-size:82px;
+    color:#fff; text-shadow:0 4px 0 rgba(0,0,0,0.12);
+    box-shadow: var(--card-shadow);
+    animation: pop .5s cubic-bezier(.34,1.56,.64,1);
+    user-select:none;
+  }
+  .letter-card small{font-size:56px; margin-left:6px; font-weight:600;}
+  @keyframes pop{ 0%{transform:scale(0.4) rotate(-8deg); opacity:0;} 100%{transform:scale(1) rotate(0); opacity:1;} }
+
+  .word-emoji{font-size:96px; animation: pop .5s cubic-bezier(.34,1.56,.64,1);}
+  .word-text{font-family:'Fredoka'; font-size:26px; font-weight:600;}
+
+  .btn{
+    border:none; cursor:pointer; font-family:'Fredoka'; font-weight:600; font-size:16px;
+    border-radius:16px; padding:14px 26px; color:#fff; background:var(--coral);
+    box-shadow:0 5px 0 #d94f4f; transition:transform .08s;
+  }
+  .btn:active{transform:translateY(4px); box-shadow:0 1px 0 #d94f4f;}
+  .btn.secondary{background:var(--sky); box-shadow:0 5px 0 #2b968c;}
+  .btn.ghost{background:#F4F1FF; color:var(--ink); box-shadow:0 5px 0 #d9d4f5;}
+  .btn.wide{width:100%;}
+  .btn-row{display:flex; gap:10px; width:100%;}
+
+  .options-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; width:100%;}
+  .option-card{
+    border-radius:20px; padding:18px 10px; text-align:center; cursor:pointer;
+    font-family:'Fredoka'; font-weight:700; font-size:40px; color:#fff;
+    box-shadow:0 6px 0 rgba(45,42,74,0.18); border:none; transition:transform .1s;
+  }
+  .option-card:active{transform:scale(0.94);}
+  .option-card.correct-flash{animation: correctPulse .5s ease;}
+  .option-card.wrong-flash{animation: shake .4s ease; opacity:0.55;}
+  @keyframes correctPulse{ 0%{transform:scale(1);} 50%{transform:scale(1.12);} 100%{transform:scale(1);} }
+
+  .game-prompt{font-family:'Fredoka'; font-size:19px; font-weight:600; text-align:center;}
+  .emoji-prompt{font-size:70px;}
+
+  .reward-star{font-size:100px; animation: starPop .6s cubic-bezier(.34,1.56,.64,1);}
+  @keyframes starPop{ 0%{transform:scale(0) rotate(-40deg); opacity:0;} 60%{transform:scale(1.3) rotate(10deg);} 100%{transform:scale(1) rotate(0); opacity:1;} }
+  .reward-text{font-family:'Fredoka'; font-size:20px; font-weight:600;}
+
+  .welcome-mascot{font-size:100px; animation: bob 2.6s ease-in-out infinite;}
+  .welcome-title{font-size:26px; text-align:center; line-height:1.2;}
+  .welcome-sub{color:#8b86a8; font-weight:700; text-align:center; font-size:14.5px; padding:0 6px;}
+  .name-input{
+    width:100%; border:2px solid #EFE9D9; border-radius:14px; padding:12px 16px;
+    font-family:'Nunito', sans-serif; font-size:15px; font-weight:700; color:var(--ink);
+    text-align:center; outline:none; background:#FBF9F2;
+  }
+  .name-input:focus{border-color:var(--sky);}
+  .audio-test{
+    background:none; border:2px dashed #C9C2E8; border-radius:14px; padding:10px 14px;
+    font-family:'Nunito'; font-weight:800; font-size:13px; color:#6b6690; cursor:pointer;
+  }
+  .audio-status{font-size:12px; font-weight:800; color:#8b86a8; text-align:center; min-height:16px;}
+
+  .train-scroll{width:100%; overflow-x:auto; padding:10px 0 6px;}
+  .train{display:flex; align-items:flex-end; gap:6px; padding:0 4px;}
+  .engine{font-size:44px; flex-shrink:0; margin-right:2px;}
+  .car{
+    flex-shrink:0; width:52px; height:60px; border-radius:12px 12px 6px 6px;
+    display:flex; align-items:center; justify-content:center; color:#fff;
+    font-family:'Fredoka'; font-weight:700; font-size:20px; cursor:pointer;
+    box-shadow:0 4px 0 rgba(45,42,74,0.18); border:none; position:relative;
+  }
+  .car::after{content:''; position:absolute; bottom:-8px; left:8px; width:10px; height:10px; border-radius:50%; background:#2D2A4A;}
+  .car::before{content:''; position:absolute; bottom:-8px; right:8px; width:10px; height:10px; border-radius:50%; background:#2D2A4A;}
+  .friends-gallery{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; width:100%;}
+  .friend{font-size:26px; background:#F4F1FF; border-radius:12px; padding:6px 9px;}
+
+  .certificate{
+    width:100%; border-radius:22px; padding:22px 18px; text-align:center;
+    background:linear-gradient(160deg, #FFF3D6, #FFE8B8);
+    border:3px dashed #E8B93E;
+  }
+  .certificate-retry{
+    background:linear-gradient(160deg, #F4F1FF, #EAE4FF);
+    border:3px dashed #C9BFF0;
+  }
+  .certificate-medal{font-size:54px; animation: starPop .6s cubic-bezier(.34,1.56,.64,1);}
+  .certificate-title{font-family:'Fredoka'; font-size:19px; font-weight:600; margin-top:4px;}
+  .certificate-phrase-it{font-family:'Fredoka'; font-size:16px; font-weight:600; color:var(--ink); margin-top:10px;}
+  .certificate-stats{margin-top:12px; font-weight:800; font-size:14px; color:var(--ink);}
+
+  .footer-note{text-align:center; font-size:11.5px; color:#b3aecf; font-weight:700; padding:2px 10px;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important;}
+  }
+</style>
 </head>
 <body>
-<div id="app">
-    <header>
-        <div class="mascot-head" onclick="speakMascot('Ciao! Sono il gatto Gatto! Impariamo l\'italiano!')">
-            <div class="mascot-avatar">🐱</div>
-            <div class="mascot-speech" id="mascot-text">Ciao! Sono il gatto Gatto! Clicca su qualsiasi lettera!</div>
-        </div>
-        <div class="stats">
-            <div class="stat-badge">⭐ <span id="star-count">0</span></div>
-            <div class="stat-badge">🎓 <span id="progress-text">0/21</span></div>
-        </div>
-    </header>
-    <div class="nav-tabs">
-        <button class="tab-btn active" onclick="switchTab('map')">🗺️ Mappa dell'Alfabeto</button>
-        <button class="tab-btn" onclick="switchTab('learn')">📖 Impara la Lettera</button>
-        <button class="tab-btn" onclick="switchTab('game1')">🎯 Gioco: Trova la lettera</button>
-        <button class="tab-btn" onclick="switchTab('game2')">🧩 Gioco: Componi la parola</button>
-        <button class="tab-btn" onclick="switchTab('stickers')">🏆 Adesivi</button>
+<div class="app">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="badge">🇮🇹</div>
+      <div>
+        <div class="title">Alfabeto</div>
+        <div class="subtitle">Alfabeto italiano</div>
+      </div>
     </div>
-    <div id="view-map" class="view-section active">
-        <div style="text-align: center; font-weight: 800; color: #666; margin-top: 5px;">Scegli una lettera per iniziare il viaggio!</div>
-        <div class="alphabet-grid" id="alphabet-grid"></div>
-    </div>
-    <div id="view-learn" class="view-section">
-        <div class="learn-container">
-            <div class="giant-card" id="giant-card" onclick="playCurrentLetterAudio()">
-                <div class="giant-letter" id="giant-letter">A a</div>
-                <div class="giant-sound" id="giant-sound">Nome: "a"</div>
-            </div>
-            <div class="word-card">
-                <div class="word-emoji" id="word-emoji">🌳</div>
-                <div class="word-italian" id="word-italian">albero</div>
-                <div class="word-trans" id="word-trans">albero</div>
-                <button class="audio-btn" onclick="playCurrentWordAudio()">🔊 Ascolta la parola</button>
-            </div>
-        </div>
-        <div class="bottom-bar">
-            <button class="action-btn" style="background:#78909c; box-shadow:0 6px 0 #455a64;" onclick="prevLetter()">⬅️ Indietro</button>
-            <button class="action-btn" onclick="switchTab('game1')">Gioca con questa lettera! 🎯</button>
-            <button class="action-btn" style="background:#4caf50; box-shadow:0 6px 0 #2e7d32;" onclick="nextLetter()">Avanti ➡️</button>
-        </div>
-    </div>
-    <div id="view-game1" class="view-section">
-        <div class="game-area">
-            <div class="game-prompt" id="game1-prompt">Trova la lettera: "a"!</div>
-            <div class="options-grid" id="game1-options"></div>
-        </div>
-        <div class="bottom-bar">
-            <div></div>
-            <button class="action-btn" style="background:#ff9800; box-shadow:0 6px 0 #e65100;" onclick="playGame1Audio()">🔊 Ascolta di nuovo</button>
-            <div></div>
-        </div>
-    </div>
-    <div id="view-game2" class="view-section">
-        <div class="game-area">
-            <div class="game-prompt" id="game2-prompt">Qual è la prima lettera della parola?</div>
-            <div style="font-size: 80px; margin: -10px 0;" id="game2-emoji">🍌</div>
-            <div style="font-size: 28px; font-weight: 800; color: #1976d2;" id="game2-word">banana</div>
-            <div class="options-grid" id="game2-options"></div>
-        </div>
-        <div class="bottom-bar">
-            <div></div>
-            <button class="action-btn" style="background:#9c27b0; box-shadow:0 6px 0 #6a1b9a;" onclick="playGame2Audio()">🔊 Ascolta la parola</button>
-            <div></div>
-        </div>
-    </div>
-    <div id="view-stickers" class="view-section">
-        <div style="text-align: center; font-weight: 800; color: #555; margin-top: 5px;">Raccogli le stelle e sblocca allegri amici italiani!</div>
-        <div class="sticker-grid" id="sticker-grid"></div>
-    </div>
-    <div class="modal-overlay" id="celebration-modal">
-        <div class="modal-body">
-            <div style="font-size: 60px;">🎉⭐🎉</div>
-            <div class="modal-title">Bravissimo!</div>
-            <div class="modal-text" id="modal-desc">Hai completato perfettamente il compito e guadagnato una nuova stella!</div>
-            <button class="action-btn" style="background:#4caf50; box-shadow:0 6px 0 #2e7d32;" onclick="closeModal()">Continua!</button>
-        </div>
-    </div>
+    <div class="stars-counter">⭐ <span id="starCount">0</span></div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+  <div class="progress-label" id="progressLabel">Hai imparato 0 lettere su 21!</div>
+
+  <div class="stage" id="stage"></div>
+
+  <div class="footer-note">Tocca 🔊 per ascoltare di nuovo il suono</div>
 </div>
 
 <script>
-    const alphabetData = [
-        {letter: "A a", name: "a", sound: "a", word: "albero", trans: "albero", color: "#2e7d32", emoji: "🌳"},
-        {letter: "B b", name: "bi", sound: "bi", word: "banana", trans: "banana", color: "#f57f17", emoji: "🍌"},
-        {letter: "C c", name: "ci", sound: "ci", word: "cane", trans: "cane", color: "#e65100", emoji: "🐕"},
-        {letter: "D d", name: "di", sound: "di", word: "dolce", trans: "dolce", color: "#c2185b", emoji: "🍰"},
-        {letter: "E e", name: "e", sound: "e", word: "elefante", trans: "elefante", color: "#455a64", emoji: "🐘"},
-        {letter: "F f", name: "effe", sound: "ef-fe", word: "fiore", trans: "fiore", color: "#7b1fa2", emoji: "🌸"},
-        {letter: "G g", name: "gi", sound: "gi", word: "gatto", trans: "gatto", color: "#5d4037", emoji: "🐱"},
-        {letter: "H h", name: "acca", sound: "ac-ca", word: "hotel", trans: "hotel", color: "#0288d1", emoji: "🏨"},
-        {letter: "I i", name: "i", sound: "i", word: "isola", trans: "isola", color: "#1565c0", emoji: "🏝️"},
-        {letter: "L l", name: "elle", sound: "el-le", word: "latte", trans: "latte", color: "#546e7a", emoji: "🥛"},
-        {letter: "M m", name: "emme", sound: "em-me", word: "medico", trans: "medico", color: "#c62828", emoji: "👨‍⚕️"},
-        {letter: "N n", name: "enne", sound: "en-ne", word: "negozio", trans: "negozio", color: "#00838f", emoji: "🏪"},
-        {letter: "O o", name: "o", sound: "o", word: "orologio", trans: "orologio", color: "#ef6c00", emoji: "⌚"},
-        {letter: "P p", name: "pi", sound: "pi", word: "pesce", trans: "pesce", color: "#8e24aa", emoji: "🐟"},
-        {letter: "Q q", name: "cu", sound: "cu", word: "quadro", trans: "quadro", color: "#fbc02d", emoji: "🖼️"},
-        {letter: "R r", name: "erre", sound: "er-re", word: "rana", trans: "rana", color: "#388e3c", emoji: "🐸"},
-        {letter: "S s", name: "esse", sound: "es-se", word: "sole", trans: "sole", color: "#f57c00", emoji: "☀️"},
-        {letter: "T t", name: "ti", sound: "ti", word: "tigre", trans: "tigre", color: "#d84315", emoji: "🐯"},
-        {letter: "U u", name: "u", sound: "u", word: "uovo", trans: "uovo", color: "#fbc02d", emoji: "🥚"},
-        {letter: "V v", name: "vu", sound: "vu", word: "vela", trans: "vela", color: "#1976d2", emoji: "⛵"},
-        {letter: "Z z", name: "zeta", sound: "ze-ta", word: "zebra", trans: "zebra", color: "#212121", emoji: "🦓"}
-    ];
+// ---------- data ----------
+const LETTERS = [
+  {ch:'A', lo:'a', name:'a',      word:'albero',   emoji:'🌳', color:'#7CB342'},
+  {ch:'B', lo:'b', name:'bi',     word:'banana',   emoji:'🍌', color:'#F5B301'},
+  {ch:'C', lo:'c', name:'ci',     word:'cane',     emoji:'🐶', color:'#FF8A3D'},
+  {ch:'D', lo:'d', name:'di',     word:'dolce',    emoji:'🍰', color:'#FF7AA2'},
+  {ch:'E', lo:'e', name:'e',      word:'elefante', emoji:'🐘', color:'#8D93A6'},
+  {ch:'F', lo:'f', name:'effe',   word:'fiore',    emoji:'🌸', color:'#A374DB'},
+  {ch:'G', lo:'g', name:'gi',     word:'gatto',    emoji:'🐱', color:'#A9744F'},
+  {ch:'H', lo:'h', name:'acca',   word:'hotel',    emoji:'🏨', color:'#4FB3D9'},
+  {ch:'I', lo:'i', name:'i',      word:'isola',    emoji:'🏝️', color:'#3E8EDE'},
+  {ch:'L', lo:'l', name:'elle',   word:'latte',    emoji:'🥛', color:'#B7AE9A'},
+  {ch:'M', lo:'m', name:'emme',   word:'medico',   emoji:'🩺', color:'#E4574C'},
+  {ch:'N', lo:'n', name:'enne',   word:'negozio',  emoji:'🏪', color:'#28C1CE'},
+  {ch:'O', lo:'o', name:'o',      word:'orologio', emoji:'⏰', color:'#F5A623'},
+  {ch:'P', lo:'p', name:'pi',     word:'pesce',    emoji:'🐟', color:'#9C4DCC'},
+  {ch:'Q', lo:'q', name:'cu',     word:'quadro',   emoji:'🖼️', color:'#E0C22E'},
+  {ch:'R', lo:'r', name:'erre',   word:'rana',     emoji:'🐸', color:'#5CA042'},
+  {ch:'S', lo:'s', name:'esse',   word:'sole',     emoji:'☀️', color:'#F2B705'},
+  {ch:'T', lo:'t', name:'ti',     word:'tigre',    emoji:'🐯', color:'#F0632D'},
+  {ch:'U', lo:'u', name:'u',      word:'uovo',     emoji:'🥚', color:'#9AA0AC'},
+  {ch:'V', lo:'v', name:'vi',     word:'vela',     emoji:'⛵', color:'#3E7FE0'},
+  {ch:'Z', lo:'z', name:'zeta',   word:'zebra',    emoji:'🦓', color:'#3B4A54'},
+];
 
-    let currentIndex = 0; 
-    let stars = 0; 
-    let completedLetters = new Set();
-    let audioUnlocked = false;
-    let cachedVoices = [];
+const MASCOT = '🐱';
+const state = { index: 0, stars: 0, stage: 'welcome', playerName: '', correctFirstTry: 0 };
 
-    function initVoices() {
-        if ('speechSynthesis' in window) {
-            cachedVoices = window.speechSynthesis.getVoices();
-        }
+const stageEl = document.getElementById('stage');
+const starCountEl = document.getElementById('starCount');
+const progressFill = document.getElementById('progressFill');
+const progressLabel = document.getElementById('progressLabel');
+
+function updateProgress(){
+  starCountEl.textContent = state.stars;
+  const pct = Math.round((state.index / LETTERS.length) * 100);
+  progressFill.style.width = pct + '%';
+  progressLabel.textContent = state.index >= LETTERS.length
+    ? 'Hai imparato tutte le 21 lettere! Bravo! 🎉'
+    : `Hai imparato ${state.index} lettere su ${LETTERS.length}!`;
+}
+
+// ---------- speech ----------
+const SPEECH_OK = typeof window !== 'undefined' && !!window.speechSynthesis;
+let voicesList = [];
+function loadVoices(){
+  if(!SPEECH_OK) return;
+  voicesList = window.speechSynthesis.getVoices() || [];
+}
+if(SPEECH_OK){
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+function pickVoice(lang){
+  if(!voicesList.length) loadVoices();
+  if(!voicesList.length) return null;
+  const short = (lang || 'it-IT').slice(0,2).toLowerCase();
+  return voicesList.find(v => v.lang && v.lang.toLowerCase().startsWith(short))
+      || voicesList.find(v => v.lang && v.lang.toLowerCase().startsWith('it'))
+      || null;
+}
+
+let audioWarned = false;
+function showAudioWarning(msg){
+  const note = document.getElementById('audioStatus') || document.querySelector('.footer-note');
+  if(note) note.textContent = msg;
+  audioWarned = true;
+}
+
+function speak(text, lang){
+  if(!SPEECH_OK){
+    showAudioWarning('La sintesi vocale non è supportata da questo browser. Prova ad aprire il file in Chrome o Safari.');
+    return;
+  }
+  try{
+    const synth = window.speechSynthesis;
+    if(synth.speaking || synth.pending) synth.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang || 'it-IT';
+    u.rate = 0.85;
+    u.pitch = 1.05;
+    u.volume = 1;
+    const v = pickVoice(lang);
+    if(v) u.voice = v;
+    u.onerror = () => {
+      showAudioWarning('Il suono non è disponibile qui. Apri il file .html direttamente nel browser (Chrome/Safari) con una connessione a Internet.');
+    };
+    u.onstart = () => {
+      const note = document.getElementById('audioStatus');
+      if(note && !audioWarned) note.textContent = '';
+    };
+    synth.speak(u);
+  }catch(e){
+    showAudioWarning('Il suono non è disponibile in questo browser.');
+  }
+}
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function pickOptions(correct){
+  const others = shuffle(LETTERS.filter(l => l.ch !== correct.ch)).slice(0, 3);
+  return shuffle([correct, ...others]);
+}
+
+function escapeHtml(str){
+  return (str || '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+function cap(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
+
+// ---------- screens ----------
+function render(){
+  stageEl.innerHTML = '';
+  if(state.stage === 'welcome') return renderWelcome();
+  if(state.stage === 'intro') return renderIntro();
+  if(state.stage === 'word') return renderWord();
+  if(state.stage === 'game') return renderGame();
+  if(state.stage === 'reward') return renderReward();
+  if(state.stage === 'final') return renderFinal();
+}
+
+function renderWelcome(){
+  stageEl.innerHTML = `
+    <div class="stage-body">
+      <div class="welcome-mascot">${MASCOT}</div>
+      <div class="welcome-title">Ciao! Sono Gatto —<br>il tuo amico di viaggio!</div>
+      <div class="welcome-sub">Impareremo insieme tutte le lettere dell'alfabeto italiano. Pronto? Andiamo!</div>
+      <input type="text" id="nameInput" class="name-input" placeholder="Come ti chiami? (facoltativo)" maxlength="20" value="${escapeHtml(state.playerName)}">
+      <button class="btn wide" id="startBtn">Inizia il gioco 🚀</button>
+      <button class="audio-test" id="audioTestBtn">🔊 Prova il suono</button>
+      <div class="audio-status" id="audioStatus"></div>
+    </div>`;
+  document.getElementById('startBtn').onclick = () => {
+    const val = document.getElementById('nameInput').value.trim();
+    state.playerName = val;
+    state.index = 0;
+    state.stars = 0;
+    state.correctFirstTry = 0;
+    state.stage = 'intro';
+    render();
+  };
+  document.getElementById('audioTestBtn').onclick = () => {
+    const note = document.getElementById('audioStatus');
+    if(note) note.textContent = 'In ascolto...';
+    speak('Ciao! Io sono Gatto!', 'it-IT');
+  };
+}
+
+function renderIntro(){
+  const L = LETTERS[state.index];
+  stageEl.innerHTML = `
+    <div class="mascot-row">
+      <div class="mascot" id="mascot">${MASCOT}</div>
+      <div class="bubble">Questa è la lettera ${cap(L.name)}! ${L.name}, ${L.name}, ${L.name} — come ${L.word}!</div>
+    </div>
+    <div class="stage-body">
+      <div class="letter-card" style="background:${L.color}" id="letterCard">${L.ch}<small>${L.lo}</small></div>
+      <div class="btn-row">
+        <button class="btn secondary" id="repeatBtn">🔊 Ripeti</button>
+      </div>
+      <button class="btn wide" id="nextBtn">Avanti →</button>
+    </div>`;
+  document.getElementById('letterCard').onclick = () => speak(L.name, 'it-IT');
+  document.getElementById('repeatBtn').onclick = () => speak(L.name, 'it-IT');
+  document.getElementById('nextBtn').onclick = () => { state.stage = 'word'; render(); };
+  speak(L.name, 'it-IT');
+}
+
+function renderWord(){
+  const L = LETTERS[state.index];
+  stageEl.innerHTML = `
+    <div class="mascot-row">
+      <div class="mascot" id="mascot">${MASCOT}</div>
+      <div class="bubble">${cap(L.ch)} — come «${L.word}»! Che bello!</div>
+    </div>
+    <div class="stage-body">
+      <div class="word-emoji" id="wordEmoji">${L.emoji}</div>
+      <div class="word-text">${L.word}</div>
+      <div class="btn-row">
+        <button class="btn secondary" id="repeatBtn">🔊 Ascolta</button>
+      </div>
+      <button class="btn wide" id="nextBtn">Gioca →</button>
+    </div>`;
+  document.getElementById('wordEmoji').onclick = () => speak(L.word, 'it-IT');
+  document.getElementById('repeatBtn').onclick = () => speak(L.word, 'it-IT');
+  document.getElementById('nextBtn').onclick = () => { state.stage = 'game'; state.attempts = 0; render(); };
+  speak(L.word, 'it-IT');
+}
+
+let gameType = 'find';
+function renderGame(){
+  const L = LETTERS[state.index];
+  gameType = state.index % 2 === 0 ? 'find' : 'assemble';
+  const options = pickOptions(L);
+
+  if(gameType === 'find'){
+    stageEl.innerHTML = `
+      <div class="mascot-row">
+        <div class="mascot" id="mascot">${MASCOT}</div>
+        <div class="bubble">Trova la lettera ${cap(L.ch)}! 🔍</div>
+      </div>
+      <div class="stage-body">
+        <div class="game-prompt">Quale carta è la lettera «${cap(L.name)}»?</div>
+        <div class="btn-row">
+          <button class="btn secondary" id="repeatBtn">🔊 Ripeti</button>
+        </div>
+        <div class="options-grid" id="optionsGrid">
+          ${options.map(o => `<button class="option-card" style="background:${o.color}" data-ch="${o.ch}">${o.ch}</button>`).join('')}
+        </div>
+      </div>`;
+    speak(L.name, 'it-IT');
+  } else {
+    stageEl.innerHTML = `
+      <div class="mascot-row">
+        <div class="mascot" id="mascot">${MASCOT}</div>
+        <div class="bubble">Costruisci la parola! Trova la prima lettera 🧩</div>
+      </div>
+      <div class="stage-body">
+        <div class="emoji-prompt">${L.emoji}</div>
+        <div class="game-prompt">Con quale lettera inizia «${L.word}»?</div>
+        <div class="btn-row">
+          <button class="btn secondary" id="repeatBtn">🔊 Ripeti</button>
+        </div>
+        <div class="options-grid" id="optionsGrid">
+          ${options.map(o => `<button class="option-card" style="background:${o.color}" data-ch="${o.ch}">${o.ch}</button>`).join('')}
+        </div>
+      </div>`;
+    speak(L.word, 'it-IT');
+  }
+
+  const repeatBtn = document.getElementById('repeatBtn');
+  if(repeatBtn) repeatBtn.onclick = () => speak(gameType === 'find' ? L.name : L.word, 'it-IT');
+
+  document.querySelectorAll('.option-card').forEach(btn => {
+    btn.onclick = () => handleAnswer(btn, btn.dataset.ch === L.ch, L);
+  });
+}
+
+function handleAnswer(btn, isCorrect, L){
+  const mascot = document.getElementById('mascot');
+  if(isCorrect){
+    btn.classList.add('correct-flash');
+    mascot.classList.add('happy');
+    speak(L.name, 'it-IT');
+    if((state.attempts || 0) === 0) state.correctFirstTry += 1;
+    setTimeout(() => { state.stage = 'reward'; render(); }, 550);
+  } else {
+    btn.classList.add('wrong-flash');
+    mascot.classList.add('oops');
+    state.attempts = (state.attempts || 0) + 1;
+    const bubble = document.querySelector('.bubble');
+    if(bubble){
+      bubble.textContent = state.attempts >= 2
+        ? `Non preoccuparti! Si dice «${L.name}». Riprova!`
+        : 'Quasi! Riprova, ti do un piccolo aiuto 😊';
     }
+    setTimeout(() => mascot.classList.remove('oops'), 400);
+  }
+}
 
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.onvoiceschanged = () => {
-            initVoices();
-        };
-        initVoices();
-    }
+function renderReward(){
+  state.index += 1;
+  state.stars += 1;
+  updateProgress();
+  const done = state.index >= LETTERS.length;
+  stageEl.innerHTML = `
+    <div class="stage-body">
+      <div class="reward-star">⭐</div>
+      <div class="reward-text">Ottimo lavoro! +1 stella!</div>
+      <div class="welcome-sub">${done ? "Hai imparato tutte le lettere! È ora di cantare la canzoncina dell'alfabeto!" : 'Pronto per la prossima lettera?'}</div>
+      <button class="btn wide" id="continueBtn">${done ? 'Canta la canzoncina 🎵' : 'Prossima lettera →'}</button>
+    </div>`;
+  document.getElementById('continueBtn').onclick = () => {
+    state.stage = done ? 'final' : 'intro';
+    render();
+  };
+}
 
-    function unlockAudio() {
-        if (!audioUnlocked && 'speechSynthesis' in window) {
-            window.speechSynthesis.resume();
-            const dummy = new SpeechSynthesisUtterance('');
-            dummy.volume = 0;
-            window.speechSynthesis.speak(dummy);
-            audioUnlocked = true;
-        }
-    }
+function renderFinal(){
+  const total = LETTERS.length;
+  const percent = Math.round((state.correctFirstTry / total) * 100);
+  const passed = percent > 40;
+  const name = state.playerName ? escapeHtml(state.playerName) : '';
+  const greetingName = name ? `, ${name}` : '';
 
-    document.addEventListener('click', unlockAudio, { once: true });
-    document.addEventListener('touchstart', unlockAudio, { once: true });
+  const certificateHtml = passed ? `
+      <div class="certificate">
+        <div class="certificate-medal">🏅</div>
+        <div class="certificate-title">Certificato${name ? ' per ' + name : ''}</div>
+        <div class="certificate-phrase-it">Complimenti! Hai completato il livello con successo!</div>
+        <div class="certificate-stats">⭐ ${state.stars} stelle · ${percent}% di risposte corrette</div>
+      </div>` : `
+      <div class="certificate certificate-retry">
+        <div class="certificate-medal">🌱</div>
+        <div class="certificate-title">Quasi fatto!</div>
+        <div class="certificate-phrase-it">Hai superato il ${percent}% delle lettere al primo tentativo. Riprova — la medaglia sarà presto tua!</div>
+      </div>`;
 
-    function getBestVoice(langPrefix) {
-        if (!cachedVoices.length && 'speechSynthesis' in window) {
-            cachedVoices = window.speechSynthesis.getVoices();
-        }
-        return cachedVoices.find(v => v.lang.toLowerCase().replace('_', '-').startsWith(langPrefix.toLowerCase())) || null;
-    }
+  stageEl.innerHTML = `
+    <div class="mascot-row">
+      <div class="mascot happy">${MASCOT}</div>
+      <div class="bubble">Bravissimo${greetingName}! Hai imparato tutto l'alfabeto! Cantiamo insieme — tocca i vagoncini!</div>
+    </div>
+    <div class="stage-body">
+      <div class="train-scroll">
+        <div class="train">
+          <div class="engine">🚂${MASCOT}</div>
+          ${LETTERS.map(L => `<button class="car" style="background:${L.color}" data-ch="${L.ch}">${L.ch}</button>`).join('')}
+        </div>
+      </div>
+      <div class="game-prompt">I tuoi amici dell'alfabeto:</div>
+      <div class="friends-gallery">
+        ${LETTERS.map(L => `<div class="friend">${L.emoji}</div>`).join('')}
+      </div>
+      ${certificateHtml}
+      <button class="btn wide" id="restartBtn">Gioca di nuovo</button>
+    </div>`;
+  document.querySelectorAll('.car').forEach(car => {
+    car.onclick = () => {
+      const L = LETTERS.find(l => l.ch === car.dataset.ch);
+      speak(`${L.name}. ${L.word}`, 'it-IT');
+    };
+  });
+  document.getElementById('restartBtn').onclick = () => {
+    state.index = 0; state.stars = 0; state.correctFirstTry = 0; state.stage = 'welcome';
+    updateProgress();
+    render();
+  };
+  if(passed) speak('Complimenti! Hai completato il livello con successo!', 'it-IT');
+}
 
-    function speakText(text, lang = 'it-IT', rate = 0.8) {
-        if (!('speechSynthesis' in window)) return;
-        
-        unlockAudio();
-        window.speechSynthesis.cancel();
-
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = rate;
-        utterance.lang = lang;
-
-        const targetLang = lang.split('-')[0];
-        const matchedVoice = getBestVoice(targetLang);
-
-        if (matchedVoice) {
-            utterance.voice = matchedVoice;
-        }
-
-        window.speechSynthesis.speak(utterance);
-    }
-
-    function setMascotText(text) { 
-        document.getElementById('mascot-text').innerText = text; 
-    }
-
-    function speakMascot(text) { 
-        setMascotText(text); 
-        speakText(text, 'it-IT', 0.9); 
-    }
-
-    function renderGrid() {
-        const gridContainer = document.getElementById('alphabet-grid');
-        gridContainer.innerHTML = '';
-        alphabetData.forEach((item, index) => {
-            const card = document.createElement('div');
-            card.className = `letter-card ${completedLetters.has(index) ? 'completed' : ''}`;
-            card.style.borderColor = item.color;
-            card.onclick = () => { currentIndex = index; switchTab('learn'); };
-            card.innerHTML = `<div class="badge-star">⭐</div><div class="main-char" style="color:${item.color}">${item.letter.split(' ')[0]}</div><div class="sub-text">${item.word}</div>`;
-            gridContainer.appendChild(card);
-        });
-    }
-
-    function switchTab(tabId) {
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
-        document.getElementById(`view-${tabId}`).classList.add('active');
-        
-        const tabs = ['map', 'learn', 'game1', 'game2', 'stickers'];
-        const btnIdx = tabs.indexOf(tabId);
-        if (btnIdx !== -1) document.querySelectorAll('.tab-btn')[btnIdx].classList.add('active');
-
-        if (tabId === 'learn') updateLearnView();
-        if (tabId === 'game1') setupGame1();
-        if (tabId === 'game2') setupGame2();
-        if (tabId === 'stickers') renderStickers();
-    }
-
-    function updateLearnView() {
-        const item = alphabetData[currentIndex];
-        document.getElementById('giant-letter').innerText = item.letter;
-        document.getElementById('giant-sound').innerText = `Lettera: "${item.sound}"`;
-        document.getElementById('giant-card').style.backgroundColor = item.color;
-        document.getElementById('word-emoji').innerText = item.emoji;
-        document.getElementById('word-italian').innerText = item.word;
-        document.getElementById('word-trans').innerText = item.trans;
-        
-        setMascotText(`Questa è la lettera ${item.letter.split(' ')[0]}! Si pronuncia come "${item.sound}". Come nella parola ${item.word}!`);
-        playCurrentLetterAudio();
-    }
-
-    function playCurrentLetterAudio() {
-        const item = alphabetData[currentIndex];
-        speakText(`${item.letter.split(' ')[0]}. ${item.word}`, 'it-IT', 0.75);
-    }
-
-    function playCurrentWordAudio() {
-        const item = alphabetData[currentIndex];
-        speakText(item.word, 'it-IT', 0.8);
-    }
-
-    function nextLetter() { currentIndex = (currentIndex + 1) % alphabetData.length; updateLearnView(); }
-    function prevLetter() { currentIndex = (currentIndex - 1 + alphabetData.length) % alphabetData.length; updateLearnView(); }
-
-    let game1CorrectIndex = 0;
-    function setupGame1() {
-        game1CorrectIndex = currentIndex;
-        const currentItem = alphabetData[game1CorrectIndex];
-        document.getElementById('game1-prompt').innerText = `Trova la lettera: "${currentItem.name.toUpperCase()}" (${currentItem.letter.split(' ')[0]})!`;
-        setMascotText(`Trova e clicca sulla lettera ${currentItem.name.toUpperCase()}!`);
-        
-        let choices = [game1CorrectIndex];
-        while (choices.length < 3) {
-            let rand = Math.floor(Math.random() * alphabetData.length);
-            if (!choices.includes(rand)) choices.push(rand);
-        }
-        choices.sort(() => Math.random() - 0.5);
-
-        const optionsContainer = document.getElementById('game1-options');
-        optionsContainer.innerHTML = '';
-        choices.forEach(idx => {
-            const item = alphabetData[idx];
-            const opt = document.createElement('div');
-            opt.className = 'option-card';
-            opt.innerHTML = `<div class="opt-text" style="color:${item.color}">${item.letter.split(' ')[0]}</div>`;
-            opt.onclick = () => checkGame1(idx, opt);
-            optionsContainer.appendChild(opt);
-        });
-        playGame1Audio();
-    }
-
-    function playGame1Audio() {
-        const currentItem = alphabetData[game1CorrectIndex];
-        speakText(`Trova la lettera: ${currentItem.letter.split(' ')[0]}`, 'it-IT', 0.8);
-    }
-
-    function checkGame1(selectedIdx, element) {
-        if (selectedIdx === game1CorrectIndex) {
-            element.classList.add('correct'); addStar(); completedLetters.add(game1CorrectIndex); renderGrid();
-            speakText("Bravissimo! Corretto!", "it-IT", 0.9);
-            setTimeout(() => { showModal("Ottimo!", `Hai trovato correttamente la lettera ${alphabetData[game1CorrectIndex].letter}!`); }, 500);
-        } else {
-            element.classList.add('wrong'); speakText("No, riprova!", "it-IT", 0.9); setMascotText("Oh, quasi! Riprova ancora!");
-        }
-    }
-
-    let game2CorrectIndex = 0;
-    function setupGame2() {
-        game2CorrectIndex = currentIndex;
-        const currentItem = alphabetData[game2CorrectIndex];
-        document.getElementById('game2-emoji').innerText = currentItem.emoji;
-        document.getElementById('game2-word').innerText = currentItem.word;
-        setMascotText(`Con quale lettera inizia la parola ${currentItem.word}?`);
-        
-        let choices = [game2CorrectIndex];
-        while (choices.length < 3) {
-            let rand = Math.floor(Math.random() * alphabetData.length);
-            if (!choices.includes(rand)) choices.push(rand);
-        }
-        choices.sort(() => Math.random() - 0.5);
-
-        const optionsContainer = document.getElementById('game2-options');
-        optionsContainer.innerHTML = '';
-        choices.forEach(idx => {
-            const item = alphabetData[idx];
-            const opt = document.createElement('div');
-            opt.className = 'option-card';
-            opt.innerHTML = `<div class="opt-text" style="color:${item.color}">${item.letter.split(' ')[0]}</div>`;
-            opt.onclick = () => checkGame2(idx, opt);
-            optionsContainer.appendChild(opt);
-        });
-        playGame2Audio();
-    }
-
-    function playGame2Audio() {
-        const currentItem = alphabetData[game2CorrectIndex];
-        speakText(currentItem.word, 'it-IT', 0.85);
-    }
-
-    function checkGame2(selectedIdx, element) {
-        if (selectedIdx === game2CorrectIndex) {
-            element.classList.add('correct'); addStar(); completedLetters.add(game2CorrectIndex); renderGrid();
-            speakText(`Bene! ${alphabetData[game2CorrectIndex].word}`, "it-IT", 0.9);
-            setTimeout(() => { showModal("Super!", `La parola ${alphabetData[game2CorrectIndex].word} inizia con la lettera ${alphabetData[game2CorrectIndex].letter.split(' ')[0]}!`); }, 500);
-        } else {
-            element.classList.add('wrong'); setMascotText("Prova un'altra lettera!");
-        }
-    }
-
-    function renderStickers() {
-        const stickerGrid = document.getElementById('sticker-grid');
-        stickerGrid.innerHTML = '';
-        alphabetData.forEach((item, idx) => {
-            const isUnlocked = completedLetters.has(idx);
-            const box = document.createElement('div');
-            box.className = `sticker-box ${isUnlocked ? '' : 'locked'}`;
-            box.innerHTML = `<div>${item.emoji}</div><div class="sticker-name">${item.word}</div>`;
-            stickerGrid.appendChild(box);
-        });
-    }
-
-    function addStar() {
-        stars += 1;
-        document.getElementById('star-count').innerText = stars;
-        document.getElementById('progress-text').innerText = `${completedLetters.size}/21`;
-    }
-
-    function showModal(title, text) {
-        document.getElementById('modal-desc').innerText = text;
-        document.getElementById('celebration-modal').style.display = 'flex';
-    }
-
-    function closeModal() {
-        document.getElementById('celebration-modal').style.display = 'none';
-        nextLetter(); switchTab('learn');
-    }
-
-    renderGrid();
+updateProgress();
+render();
 </script>
 </body>
 </html>
